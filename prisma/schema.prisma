@@ -14,27 +14,17 @@ model Users {
   userId Int @id @default(autoincrement()) @map("userId")
   email String @unique @map("email")
   password String @map("password")
-
-  userInfos UserInfos?
-  posts Posts[]
-  coments Coments[]
-
-  @@map("Users")
-}
-
-model UserInfos {
-  userInfoId Int @id @default(autoincrement()) @map("userInfoId")
-  userId Int @unique @map("userId")
   name String @map("name")
   age Int @map("age")
   gender String @map("gender")
-  profileImage String @map("profileImage")
+  profileImage String? @map("profileImage")
   interest String @map("interest")
   selfInfo String @db.Text @map("selfInfo")
 
-  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  posts Posts[]
+  comments Comments[]
 
-  @@map("UserInfos")
+  @@map("Users")
 }
 
 model Posts {
@@ -47,13 +37,13 @@ model Posts {
   createdAt DateTime @default(now()) @map("createdAt")
 
   user Users @relation(fields: [userId],references: [userId], onDelete: Cascade)
-  coments Coments[]
+  comments Comments[]
 
   @@map("Posts")
 }
 
-model Coments {
-  comentId Int @id @default(autoincrement()) @map("comentId")
+model Comments {
+  commentId Int @id @default(autoincrement()) @map("commentId")
   postId Int @map("postId")
   userId Int @map("userId")
   content String @db.Text @map("content")
@@ -62,5 +52,5 @@ model Coments {
   post Posts @relation(fields: [postId],references: [postId], onDelete: Cascade)
   user Users @relation(fields: [userId],references: [userId], onDelete: Cascade)
 
-  @@map("Coments")
+  @@map("Comments")
 }
