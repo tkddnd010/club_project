@@ -11,8 +11,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/user', userRouter);
-app.use('/posts', postsRouter);
-app.use('/comments', commentsRouter);
+app.use('/posts', [postsRouter, commentsRouter]);
 
 app.listen(PORT, () => {
   console.log(PORT, '포트로 서버가 열렸습니다.');
