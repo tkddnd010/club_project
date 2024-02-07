@@ -43,7 +43,7 @@ model Posts {
 }
 
 model Comments {
-  commentId Int @id @default(autoincrement()) @map("comentId")
+  commentId Int @id @default(autoincrement()) @map("commentId")
   postId Int @map("postId")
   userId Int @map("userId")
   content String @db.Text @map("content")
