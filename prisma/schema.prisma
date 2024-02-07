@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  userId Int @id @default(autoincrement()) @map("userId")
+  email String @unique @map("email")
+  password String @map("password")
+
+  userInfos UserInfos?
+  posts Posts[]
+  coments Coments[]
+
+  @@map("Users")
+}
+
+model UserInfos {
+  userInfoId Int @id @default(autoincrement()) @map("userInfoId")
+  userId Int @unique @map("userId")
+  name String @map("name")
+  age Int @map("age")
+  gender String @map("gender")
+  profileImage String @map("profileImage")
+  interest String @map("interest")
+  selfInfo String @db.Text @map("selfInfo")
+
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("UserInfos")
+}
+
+model Posts {
+  postId Int @id @default(autoincrement()) @map("postId")
+  userId Int @map("userId")
+  title String @map("title")
+  image String @map("image")
+  content String @db.Text @map("content")
+  like Int @map("like")
+  createdAt DateTime @default(now()) @map("createdAt")
+
+  user Users @relation(fields: [userId],references: [userId], onDelete: Cascade)
+  coments Coments[]
+
+  @@map("Posts")
+}
+
+model Coments {
+  comentId Int @id @default(autoincrement()) @map("comentId")
+  postId Int @map("postId")
+  userId Int @map("userId")
+  content String @db.Text @map("content")
+  createdAt DateTime @default(now()) @map("createdAt")
+
+  post Posts @relation(fields: [postId],references: [postId], onDelete: Cascade)
+  user Users @relation(fields: [userId],references: [userId], onDelete: Cascade)
+
+  @@map("Coments")
+}
