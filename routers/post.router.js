@@ -5,21 +5,23 @@ import authomiddleware from '../middlewares/authomiddleware.js';
 const router = express.Router();
 
 // 게시물 작성 API
-router.post('/', authomiddleware, async (req, res, next) => {
+
+router.post('/', async (req, res, next) => {
   const { title, image, interest, content, location } = req.body;
-  const { userId } = req.user;
+  const { postId } = req.posts;
 
   const post = await prisma.posts.create({
     data: {
-      userId: +userId,
-      title,
-      image,
-      interest,
-      content,
-      location,
+      postId: +postId,
+      title: title,
+      image: image,
+      interest: interest,
+      content: content,
+      location: location,
     },
   });
-  return res.status(201).json({ data: post });
+
+  return res.status(201).json({ message: '게시물이 작성되었습니다.' });
 });
 
 // 게시물 조회 API
@@ -36,6 +38,7 @@ router.get('/', async (req, res, next) => {
       createdAt: 'desc',
     },
   });
+
   return res.status(200).json({ data: posts });
 });
 
