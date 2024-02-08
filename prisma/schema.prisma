@@ -33,7 +33,7 @@ model Posts {
   title String @map("title")
   image String @map("image")
   content String @db.Text @map("content")
-  like Int @map("like")
+  like Int? @map("like")
   createdAt DateTime @default(now()) @map("createdAt")
 
   user Users @relation(fields: [userId],references: [userId], onDelete: Cascade)
