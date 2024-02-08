@@ -1,21 +1,24 @@
 import express from 'express';
 import { prisma } from '../model/index.js';
+import {
+  createAccessToken,
+  validateAccessToken,
+} from '../middlewares/authomiddleware.js';
 
 const router = express.Router();
 
 // 게시물 작성 API
-router.post('/', async (req, res, next) => {
+router.post('/', validateAccessToken, async (req, res, next) => {
   const { title, image, interest, content, location } = req.body;
-  const { postId } = req.posts;
+  const { userId } = req.user;
 
   const post = await prisma.posts.create({
     data: {
-      postId: +postId,
+      userId: +userId, // 사용자 구분용도(필수)
       title: title,
       image: image,
       interest: interest,
       content: content,
-      location: location,
     },
   });
 
@@ -27,10 +30,13 @@ router.get('/', async (req, res, next) => {
   const posts = await prisma.posts.findMany({
     select: {
       postId: true,
-      userId: true,
       title: true,
       createdAt: true,
-      updatedAt: true,
+      user: {
+        select: {
+          name: true,
+        },
+      },
     },
     orderBy: {
       createdAt: 'desc',
@@ -40,8 +46,30 @@ router.get('/', async (req, res, next) => {
   return res.status(200).json({ data: posts });
 });
 
+// 게시물 상세 조회 API
+router.get('/:postId', async (req, res, next) => {
+  const { postId } = req.params;
+  const post = await prisma.posts.findFirst({
+    where: { postId: +postId },
+    select: {
+      postId: true,
+      title: true,
+      image: true,
+      createdAt: true,
+      content: true,
+      user: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+
+  return res.status(200).json({ data: post });
+});
+
 // 게시물 수정 API
-router.put('/:postId', async (req, res, next) => {
+router.put('/:postId', validateAccessToken, async (req, res, next) => {
   const { postId } = req.params;
   const { userId } = req.uers;
   const { title, image, interest, content, location } = req.body;
@@ -60,5 +88,6 @@ router.put('/:postId', async (req, res, next) => {
 });
 
 // 게시물 삭제 API
+router.delete('/posts');
 
 export default router;
