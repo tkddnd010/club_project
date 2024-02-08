@@ -43,6 +43,22 @@ router.get('/', async (req, res, next) => {
 // 게시물 수정 API
 router.put('/:postId', async (req, res, next) => {
   const { postId } = req.params;
+  const { userId } = req.uers;
+  const { title, image, interest, content, location } = req.body;
+
+  await prisma.posts.create({
+    data: {
+      title,
+      image,
+      interest,
+      content,
+      location,
+    },
+  });
+
+  return res.status(201).json({ message: '게시물이 수정되었습니다.' });
 });
+
+// 게시물 삭제 API
 
 export default router;
