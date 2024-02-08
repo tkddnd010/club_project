@@ -40,4 +40,9 @@ router.get('/', async (req, res, next) => {
   return res.status(200).json({ data: posts });
 });
 
+// 게시물 수정 API
+router.put('/:postId', async (req, res, next) => {
+  const { postId } = req.params;
+});
+
 export default router;
