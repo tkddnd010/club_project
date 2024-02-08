@@ -101,23 +101,44 @@ router.get('/me', validateAccessToken, async (req, res, next) => {
 });
 
 // 프로필 수정 API
-router.put("/me",validateAccessToken , async (req, res, next) => {
+router.put("/me", validateAccessToken, async (req, res, next) => {
   const { userId } = req.user;
-  const { name, interest, selfInfo } = req.body;
+  const { name, interest, selfInfo, password, passwordcheck } = req.body;
   const user = await prisma.Users.findUnique({
     where: { userId: +userId },
   });
 
-  const updateduser = await prisma.Users.update({
-    where: { userId: +userId },
-    data: {
-      userId: +userId,
-      name,
-      interest,
-      selfInfo,
-    },
-  });
-  return res.status(200).json({ message : "수정이 완료되었습니다." });
+  if (password && passwordcheck) {
+    if (password !== passwordcheck) {
+      return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." })
+    }
+
+    const hashpassword = await bcrypt.hash(password, 10);
+    await prisma.users.update({
+      where: { userId: +userId },
+      data: {
+        userId: +userId,
+        name,
+        interest,
+        selfInfo,
+        password: hashpassword,
+      },
+    })
+  } else {
+    const updateduser = await prisma.Users.update({
+      where: { userId: +userId },
+      data: {
+        userId: +userId,
+        name,
+        interest,
+        selfInfo,
+      },
+    });
+  }
+
+
+  return res.status(200).json({ message: "수정이 완료되었습니다." });
 });
+
 
 export default router;
