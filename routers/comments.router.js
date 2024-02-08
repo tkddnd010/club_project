@@ -1,13 +1,16 @@
 import express from 'express';
 import { prisma } from '../model/index.js';
-// import authMiddleware from '../middlewares/authomiddleware.js';
+import {
+  createAccessToken,
+  validateAccessToken,
+} from '../middlewares/authomiddleware.js';
 
 const router = express.Router();
 
 // 댓글 생성 API
 router.post(
   '/posts/:postId/comments',
-  // authMiddleware,
+  validateAccessToken,
   async (req, res, next) => {
     const { commentId } = req.params;
     const { content } = req.body;
@@ -40,8 +43,8 @@ router.get('/:postId/comments', async (req, res, next) => {
 
 // 댓글 수정 API
 router.put(
-  '/posts/:postId/comments/:commentId',
-  // authMiddleware,
+  '/:postId/comments/:commentId',
+  validateAccessToken,
   async (req, res, next) => {
     const { commentId } = req.params;
     const { userId } = req.user;
@@ -71,8 +74,8 @@ router.put(
 
 // 댓글 삭제 API
 router.delete(
-  '/posts/:postId/comments/:commentId',
-  // authMiddleware,
+  '/:postId/comments/:commentId',
+  validateAccessToken,
   async (req, res, next) => {
     const { commentId } = req.params;
     const { userId } = req.user;
