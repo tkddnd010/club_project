@@ -1,27 +1,31 @@
 import express from 'express';
 import { prisma } from '../model/index.js';
-import authMiddleware from '../middlewares/authomiddleware.js';
+// import authMiddleware from '../middlewares/authomiddleware.js';
 
 const router = express.Router();
 
 // 댓글 생성 API
-router.post('/:postId/comments', authMiddleware, async (req, res, next) => {
-  const { commentId } = req.params;
-  const { content } = req.body;
-  const { userId } = req.user;
+router.post(
+  '/posts/:postId/comments',
+  // authMiddleware,
+  async (req, res, next) => {
+    const { commentId } = req.params;
+    const { content } = req.body;
+    const { userId } = req.user;
 
-  const post = await prisma.posts.findFirst({ where: { postId: +postId } });
-  if (!post) return res.status(404).json({ message: '댓글이 없습니다.' });
+    const post = await prisma.posts.findFirst({ where: { postId: +postId } });
+    if (!post) return res.status(404).json({ message: '댓글이 없습니다.' });
 
-  const comment = await prisma.comments.create({
-    data: {
-      postId: +postId,
-      userId: +userId,
-      content: content,
-    },
-  });
-  return res.status(201).json({ data: comment });
-});
+    const comment = await prisma.comments.create({
+      data: {
+        postId: +postId,
+        userId: +userId,
+        content: content,
+      },
+    });
+    return res.status(201).json({ data: comment });
+  }
+);
 
 // 댓글 조회 API
 router.get('/:postId/comments', async (req, res, next) => {
@@ -36,8 +40,8 @@ router.get('/:postId/comments', async (req, res, next) => {
 
 // 댓글 수정 API
 router.put(
-  '/:postId/comments/:commentId',
-  authMiddleware,
+  '/posts/:postId/comments/:commentId',
+  // authMiddleware,
   async (req, res, next) => {
     const { commentId } = req.params;
     const { userId } = req.user;
@@ -67,8 +71,8 @@ router.put(
 
 // 댓글 삭제 API
 router.delete(
-  '/:postId/comments/:commentId',
-  authMiddleware,
+  '/posts/:postId/comments/:commentId',
+  // authMiddleware,
   async (req, res, next) => {
     const { commentId } = req.params;
     const { userId } = req.user;
