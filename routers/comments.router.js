@@ -4,11 +4,12 @@ import authMiddleware from '../middlewares/authomiddleware.js';
 
 const router = express.Router();
 
+// 댓글 생성 API
 router.post(
   '/posts/:postId/comments',
   authMiddleware,
   async (req, res, next) => {
-    const { postId } = req.params;
+    const { commentId } = req.params;
     const { content } = req.body;
     const { userId } = req.user;
 
@@ -26,8 +27,9 @@ router.post(
   }
 );
 
+// 댓글 조회 API
 router.get('/posts/:postId/comments', async (req, res, next) => {
-  const { postId } = req.params;
+  const { commentId } = req.params;
 
   const comments = await prisma.comments.findMany({
     where: { postId: +postId },
@@ -35,5 +37,55 @@ router.get('/posts/:postId/comments', async (req, res, next) => {
   });
   return res.status(200).json({ data: comments });
 });
+
+// 댓글 수정 API
+router.put(
+  '/posts/:postId/comments/:commentId',
+  authMiddleware,
+  async (req, res, next) => {
+    const { commentId } = req.params;
+    const { userId } = req.user;
+
+    const { content } = req.body;
+    const currentContent = await prisma.comments.findById(commentId).exec();
+
+    if (!currentContent) {
+      return res.status(404).json({ errMessage: '수정할 내용이 없습니다.' });
+    }
+
+    if (currentContent) {
+      const targetContent = await prisma.comments.findOne({ content }).exec();
+      if (targetContent) {
+        targetContent.content = currentContent.content;
+        await targetContent.save();
+      }
+
+      currentContent.content = content;
+    }
+
+    await currentContent.save();
+
+    return res.status(200).json({});
+  }
+);
+
+// 댓글 삭제 API
+router.delete(
+  '/posts/:postId/comments/:commentId',
+  authMiddleware,
+  async (req, res, next) => {
+    const { commentId } = req.params;
+    const { userId } = req.user;
+
+    const content = await prisma.comments.findById(commentId).exec();
+    if (!content) {
+      return res.status(404).json({ errMessage: '댓글이 존재하지 않습니다.' });
+    }
+
+    await prisma.comments.delete({ _id: commentId });
+
+    return res.status(200).json({ message: '댓글이 삭제되었습니다.' });
+  }
+);
 
 export default router;
