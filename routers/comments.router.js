@@ -5,30 +5,26 @@ import authMiddleware from '../middlewares/authomiddleware.js';
 const router = express.Router();
 
 // 댓글 생성 API
-router.post(
-  '/posts/:postId/comments',
-  authMiddleware,
-  async (req, res, next) => {
-    const { commentId } = req.params;
-    const { content } = req.body;
-    const { userId } = req.user;
+router.post('/:postId/comments', authMiddleware, async (req, res, next) => {
+  const { commentId } = req.params;
+  const { content } = req.body;
+  const { userId } = req.user;
 
-    const post = await prisma.posts.findFirst({ where: { postId: +postId } });
-    if (!post) return res.status(404).json({ message: '댓글이 없습니다.' });
+  const post = await prisma.posts.findFirst({ where: { postId: +postId } });
+  if (!post) return res.status(404).json({ message: '댓글이 없습니다.' });
 
-    const comment = await prisma.comments.create({
-      data: {
-        postId: +postId,
-        userId: +userId,
-        content: content,
-      },
-    });
-    return res.status(201).json({ data: comment });
-  }
-);
+  const comment = await prisma.comments.create({
+    data: {
+      postId: +postId,
+      userId: +userId,
+      content: content,
+    },
+  });
+  return res.status(201).json({ data: comment });
+});
 
 // 댓글 조회 API
-router.get('/posts/:postId/comments', async (req, res, next) => {
+router.get('/:postId/comments', async (req, res, next) => {
   const { commentId } = req.params;
 
   const comments = await prisma.comments.findMany({
@@ -40,7 +36,7 @@ router.get('/posts/:postId/comments', async (req, res, next) => {
 
 // 댓글 수정 API
 router.put(
-  '/posts/:postId/comments/:commentId',
+  '/:postId/comments/:commentId',
   authMiddleware,
   async (req, res, next) => {
     const { commentId } = req.params;
@@ -53,7 +49,7 @@ router.put(
       return res.status(404).json({ errMessage: '수정할 내용이 없습니다.' });
     }
 
-    if (currentContent) {
+    if (content) {
       const targetContent = await prisma.comments.findOne({ content }).exec();
       if (targetContent) {
         targetContent.content = currentContent.content;
@@ -71,7 +67,7 @@ router.put(
 
 // 댓글 삭제 API
 router.delete(
-  '/posts/:postId/comments/:commentId',
+  '/:postId/comments/:commentId',
   authMiddleware,
   async (req, res, next) => {
     const { commentId } = req.params;
