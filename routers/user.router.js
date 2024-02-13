@@ -75,16 +75,16 @@ router.post('/sign-in', async (req, res, next) => {
   return res.status(200).json({ message: '로그인에 성공하였습니다.' });
 });
 
+// 로그아웃 API
 router.delete('/sign-out', async (req, res, next) => {
   res.setHeader(
     'Set-Cookie',
-    'authorization=; path=/; expires=Thu, Jan 1970 00:00:00 GMT; httponly'
+    'accessToken=; path=/; expires=Thu, Jan 1970 00:00:00 GMT; httponly'
   );
   res.status(204).end();
 });
 
-// 회원 조회 API
-
+// 프로필 조회 API
 router.get('/me', validateAccessToken, async (req, res, next) => {
   const { userId } = req.user;
   const user = await prisma.users.findFirst({
