@@ -56,7 +56,7 @@ router.post('/sign-up', async (req, res, next) => {
       email,
       authonum,
       password,
-      passwordchek,
+      passwordcheck,
       name,
       age,
       gender,
@@ -67,7 +67,7 @@ router.post('/sign-up', async (req, res, next) => {
     if (
       !(
         password &&
-        passwordchek &&
+        passwordcheck &&
         name &&
         age &&
         gender &&
@@ -82,7 +82,7 @@ router.post('/sign-up', async (req, res, next) => {
         .status(400)
         .json({ message: '비밀번호는 6자리 이상을 입력해주세요' });
 
-    if (password !== passwordchek)
+    if (password !== passwordcheck)
       return res.status(400).json({ message: '비밀번호가 일치하지 않습니다' });
 
     const user = await prisma.users.findFirst({
