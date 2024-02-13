@@ -1,4 +1,7 @@
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export const transPort = nodemailer.createTransport({
   service: 'naver',
@@ -6,7 +9,7 @@ export const transPort = nodemailer.createTransport({
   port: 465,
   secure: false,
   auth: {
-    user: 'tkddnd010@naver.com',
-    pass: 'tkddnd!!.0302',
+    user: process.env.USERID,
+    pass: process.env.PASSWORD,
   },
 });
