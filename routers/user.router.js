@@ -124,7 +124,7 @@ router.post('/sign-in', async (req, res, next) => {
   const user = await prisma.users.findFirst({ where: { email } });
   if (!user)
     return res.status(401).json({ message: '존재하지 않는 이메일입니다.' });
-  if (!bcrypt.compare(password, user.password))
+  if (!(await bcrypt.compare(password, user.password)))
     return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
   // 엑세스 토큰 생성!!
   if (!createAccessToken(res, user.userId)) {
