@@ -56,7 +56,7 @@ router.post('/sign-up', async (req, res, next) => {
       email,
       authonum,
       password,
-      passwordchek,
+      passwordcheck,
       name,
       age,
       gender,
@@ -67,7 +67,7 @@ router.post('/sign-up', async (req, res, next) => {
     if (
       !(
         password &&
-        passwordchek &&
+        passwordcheck &&
         name &&
         age &&
         gender &&
@@ -82,7 +82,7 @@ router.post('/sign-up', async (req, res, next) => {
         .status(400)
         .json({ message: '비밀번호는 6자리 이상을 입력해주세요' });
 
-    if (password !== passwordchek)
+    if (password !== passwordcheck)
       return res.status(400).json({ message: '비밀번호가 일치하지 않습니다' });
 
     const user = await prisma.users.findFirst({
@@ -124,7 +124,7 @@ router.post('/sign-in', async (req, res, next) => {
   const user = await prisma.users.findFirst({ where: { email } });
   if (!user)
     return res.status(401).json({ message: '존재하지 않는 이메일입니다.' });
-  if (!bcrypt.compare(password, user.password))
+  if (!(await bcrypt.compare(password, user.password)))
     return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
   // 엑세스 토큰 생성!!
   if (!createAccessToken(res, user.userId)) {
@@ -162,34 +162,29 @@ router.get('/me', validateAccessToken, async (req, res, next) => {
 });
 
 // 프로필 수정 API
-router.put("/me", validateAccessToken, async (req, res, next) => {
+router.put('/me', validateAccessToken, async (req, res, next) => {
   const { userId } = req.user;
   const { name, interest, selfInfo, password, passwordcheck } = req.body;
-  const user = await prisma.Users.findUnique({
-    where: { userId: +userId },
-  });
 
   if (password && passwordcheck) {
     if (password !== passwordcheck) {
-      return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." })
+      return res.status(400).json({ message: '비밀번호가 일치하지 않습니다.' });
     }
 
     const hashpassword = await bcrypt.hash(password, 10);
     await prisma.users.update({
       where: { userId: +userId },
       data: {
-        userId: +userId,
         name,
         interest,
         selfInfo,
         password: hashpassword,
       },
-    })
+    });
   } else {
-    const updateduser = await prisma.Users.update({
+    await prisma.users.update({
       where: { userId: +userId },
       data: {
-        userId: +userId,
         name,
         interest,
         selfInfo,
@@ -197,9 +192,7 @@ router.put("/me", validateAccessToken, async (req, res, next) => {
     });
   }
 
-
-  return res.status(200).json({ message: "수정이 완료되었습니다." });
+  return res.status(200).json({ message: '수정이 완료되었습니다.' });
 });
-
 
 export default router;
