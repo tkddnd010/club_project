@@ -31,6 +31,7 @@ router.post(
 );
 
 // 댓글 조회 API
+
 router.get('/:postId/comments', async (req, res, next) => {
   const { postId } = req.params;
 

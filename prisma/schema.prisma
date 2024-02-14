@@ -11,48 +11,62 @@ datasource db {
 }
 
 model Users {
-  userId Int @id @default(autoincrement()) @map("userId")
-  email String @unique @map("email")
-  password String? @map("password")
-  name String? @map("name")
-  age Int? @map("age")
-  gender String? @map("gender")
+  userId       Int     @id @default(autoincrement()) @map("userId")
+  email        String  @unique @map("email")
+  password     String? @map("password")
+  name         String? @map("name")
+  age          Int?    @map("age")
+  gender       String? @map("gender")
   profileImage String? @map("profileImage")
-  interest String? @map("interest")
-  selfInfo String? @db.Text @map("selfInfo")
-  status String @default("Waiting") @map("status")
-  token Int @map("token")
+  interest     String? @map("interest")
+  selfInfo     String? @map("selfInfo") @db.Text
+  status       String  @default("Waiting") @map("status")
+  token        Int     @map("token")
 
-  posts Posts[]
+  posts    Posts[]
   comments Comments[]
+  Likes    Likes[]
 
   @@map("Users")
 }
 
 model Posts {
-  postId Int @id @default(autoincrement()) @map("postId")
-  userId Int @map("userId")
-  title String @map("title")
-  image String @map("image")
-  content String @db.Text @map("content")
-  like Int? @map("like")
+  postId    Int      @id @default(autoincrement()) @map("postId")
+  userId    Int      @map("userId")
+  title     String   @map("title")
+  image     String   @map("image")
+  content   String   @map("content") @db.Text
   createdAt DateTime @default(now()) @map("createdAt")
 
-  user Users @relation(fields: [userId],references: [userId], onDelete: Cascade)
+  user     Users      @relation(fields: [userId], references: [userId], onDelete: Cascade)
   comments Comments[]
+  Likes    Likes[]
 
   @@map("Posts")
 }
 
 model Comments {
-  commentId Int @id @default(autoincrement()) @map("commentId")
-  postId Int @map("postId")
-  userId Int @map("userId")
-  content String @db.Text @map("content")
+  commentId Int      @id @default(autoincrement()) @map("commentId")
+  postId    Int      @map("postId")
+  userId    Int      @map("userId")
+  content   String   @map("content") @db.Text
   createdAt DateTime @default(now()) @map("createdAt")
 
-  post Posts @relation(fields: [postId],references: [postId], onDelete: Cascade)
-  user Users @relation(fields: [userId],references: [userId], onDelete: Cascade)
+  post Posts @relation(fields: [postId], references: [postId], onDelete: Cascade)
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@map("Comments")
+}
+
+model Likes {
+  likeId    Int      @id @default(autoincrement())
+  like      Int?     @default(0) @map("like")
+  postId    Int
+  userId    Int
+  createdAt DateTime @default(now())
+
+  post Posts @relation(fields: [postId], references: [postId])
+  user Users @relation(fields: [userId], references: [userId])
+
+  @@map("Likes")
 }

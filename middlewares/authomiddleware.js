@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { prisma } from '../model/index.js';
 dotenv.config();
+
 function createAccessToken(res, id) {
   const accessToken = jwt.sign(
     { id: id },
@@ -11,6 +12,7 @@ function createAccessToken(res, id) {
   res.cookie('accessToken', accessToken);
   return accessToken;
 }
+
 async function validateAccessToken(req, res, next) {
   const { accessToken } = req.cookies;
   if (!accessToken) {
@@ -37,6 +39,7 @@ async function validateAccessToken(req, res, next) {
   req.user = user;
   next();
 }
+
 function validateToken(token, secretkey) {
   try {
     const payload = jwt.verify(token, secretkey);
@@ -45,4 +48,5 @@ function validateToken(token, secretkey) {
     return null;
   }
 }
+
 export { createAccessToken, validateAccessToken };
