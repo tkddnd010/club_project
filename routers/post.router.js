@@ -112,4 +112,44 @@ router.delete('/:postId', validateAccessToken, async (req, res, next) => {
   return res.json({ message: '게시물이 삭제되었습니다.' });
 });
 
+// 게시물 좋아요 기능
+router.post('/:postId', validateAccessToken, async (req, res, next) => {
+  try {
+    const { postId } = req.params;
+    const post = await prisma.posts.findFirst({ where: { postId: +postId } });
+    if (!post) {
+      return res.status(404).json({ message: '해당 게시물이 없습니다.' });
+    }
+
+    // 사용자가 해당 게시물에 대해 이미 좋아요를 눌렀는지 확인
+    const existingLike = await prisma.likes.findFirst({
+      where: {
+        postId: +postId,
+        userId: req.user.userId, // 사용자 ID
+      },
+    });
+
+    if (existingLike) {
+      // 이미 좋아요를 눌렀으면 좋아요 취소
+      await prisma.likes.delete({
+        where: {
+          likeId: existingLike.likeId,
+        },
+      });
+      return res.status(200).json({ message: '게시물 좋아요를 취소합니다.' });
+    } else {
+      // 좋아요를 누르지 않았으면 좋아요 추가
+      await prisma.likes.create({
+        data: {
+          postId: +postId,
+          userId: req.user.userId, // 사용자 ID
+        },
+      });
+      return res.status(201).json({ message: '게시물을 좋아합니다.' });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

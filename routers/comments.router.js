@@ -38,6 +38,7 @@ router.get('/:postId/comments', async (req, res, next) => {
   const comments = await prisma.comments.findMany({
     where: { postId: +postId },
     select: {
+      commentId: true,
       content: true,
       createdAt: true,
       user: {
@@ -47,10 +48,6 @@ router.get('/:postId/comments', async (req, res, next) => {
       },
     },
     orderBy: { createdAt: 'desc' },
-    select: {
-      content: true,
-      createdAt: true,
-    },
   });
   return res.status(200).json({ data: comments });
 });

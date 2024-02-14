@@ -23,6 +23,7 @@ model Users {
 
   posts    Posts[]
   comments Comments[]
+  Likes    Likes[]
 
   @@map("Users")
 }
@@ -33,11 +34,11 @@ model Posts {
   title     String   @map("title")
   image     String   @map("image")
   content   String   @map("content") @db.Text
-  like      Int?     @map("like")
   createdAt DateTime @default(now()) @map("createdAt")
 
   user     Users      @relation(fields: [userId], references: [userId], onDelete: Cascade)
   comments Comments[]
+  Likes    Likes[]
 
   @@map("Posts")
 }
@@ -53,4 +54,17 @@ model Comments {
   user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@map("Comments")
+}
+
+model Likes {
+  likeId    Int      @id @default(autoincrement())
+  like      Int?     @default(0) @map("like")
+  postId    Int
+  userId    Int
+  createdAt DateTime @default(now())
+
+  post Posts @relation(fields: [postId], references: [postId])
+  user Users @relation(fields: [userId], references: [userId])
+
+  @@map("Likes")
 }
