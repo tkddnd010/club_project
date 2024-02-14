@@ -8,7 +8,6 @@ import {
 } from '../middlewares/authomiddleware.js';
 
 const router = express.Router();
-
 // 인증메일 발송 API
 router.post('/authmail', async (req, res, next) => {
   const { email } = req.body;
@@ -158,6 +157,7 @@ router.get('/me', validateAccessToken, async (req, res, next) => {
       selfInfo: true,
     },
   });
+
   return res.status(200).json({ data: user });
 });
 
